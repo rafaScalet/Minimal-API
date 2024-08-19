@@ -23,7 +23,7 @@ app.MapGet("/", () => "Hello World!");
 app.MapGet("/teste", () => builder);
 
 app.MapPost("/login", (LoginDTO loginDTO) => {
-	if (loginDTO.Email == "admin@email.com" && loginDTO.PWD == "1234")
+	if (loginDTO.Email == "admin@email.com" && loginDTO.PWD == dbPassword)
 		return Results.Ok("Login efetuado");
 	else
 		return Results.Unauthorized();

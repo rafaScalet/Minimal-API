@@ -14,11 +14,27 @@ public class MyContext : DbContext
 
 	DbSet<Admin> Admin { get; set; } = default!;
 
+	protected override void OnModelCreating(ModelBuilder modelBuilder)
+	{
+		modelBuilder.Entity<Admin>().HasData(
+			new Admin {
+				Id = 1,
+				Email = "admin@email.com",
+				PWD = "1234",
+				Profile = "adm"
+			}
+		);
+	}
+
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{
 		if (!optionsBuilder.IsConfigured)
 		{
+			var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+
 			var connectionString = _appSettingsConfiguration.GetConnectionString("DefaultConnection")?.ToString();
+
+			connectionString = connectionString?.Replace("{DB_PASSWORD}", dbPassword);
 
 			if (!string.IsNullOrEmpty(connectionString))
 			{
