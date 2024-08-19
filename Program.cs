@@ -1,9 +1,14 @@
 using DotNetEnv;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MinimalAPI.Domain.DTOs;
+using MinimalAPI.Domain.Interfaces;
+using MinimalAPI.Domain.Services;
 using MinimalAPI.Infrastructure.Db;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<IAdminServices, AdminServices>();
 
 Env.Load();
 
@@ -20,10 +25,9 @@ builder.Services.AddDbContext<MyContext>(options => {
 var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
-app.MapGet("/teste", () => builder);
 
-app.MapPost("/login", (LoginDTO loginDTO) => {
-	if (loginDTO.Email == "admin@email.com" && loginDTO.PWD == dbPassword)
+app.MapPost("/login", ([FromBody] LoginDTO loginDTO, IAdminServices adminServices) => {
+	if (adminServices.Login(loginDTO) != null)
 		return Results.Ok("Login efetuado");
 	else
 		return Results.Unauthorized();
