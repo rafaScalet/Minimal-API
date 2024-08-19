@@ -13,9 +13,11 @@ public class Admin
 	[StringLength(255)]
 	public string Email { get; set; } = default!;
 
+	[Required]
 	[StringLength(50)]
 	public string PWD { get; set; } = default!;
 
+	[Required]
 	[StringLength(10)]
 	public string Profile { get; set; } = default!;
 }
