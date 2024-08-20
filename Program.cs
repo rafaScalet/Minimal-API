@@ -7,13 +7,13 @@ using MinimalAPI.Domain.ModelViews;
 using MinimalAPI.Domain.Services;
 using MinimalAPI.Infrastructure.Db;
 
+#region Builder
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IAdminServices, AdminServices>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 Env.Load();
 
 var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
@@ -27,7 +27,9 @@ builder.Services.AddDbContext<MyContext>(options => {
 });
 
 var app = builder.Build();
+#endregion
 
+#region Admin
 app.MapGet("/", () => Results.Json(new Home()));
 
 app.MapPost("/login", ([FromBody] LoginDTO loginDTO, IAdminServices adminServices) => {
@@ -36,8 +38,15 @@ app.MapPost("/login", ([FromBody] LoginDTO loginDTO, IAdminServices adminService
 	else
 		return Results.Unauthorized();
 });
+#endregion
 
+#region Vehicles
+
+#endregion
+
+#region APP
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.Run();
+#endregion
