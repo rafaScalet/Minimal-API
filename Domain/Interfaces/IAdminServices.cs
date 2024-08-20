@@ -1,5 +1,5 @@
 using MinimalAPI.Domain.DTOs;
-using MinimalAPI.Entities.Admin;
+using MinimalAPI.Entities;
 
 namespace MinimalAPI.Domain.Interfaces;
 
