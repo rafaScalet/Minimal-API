@@ -1,6 +1,22 @@
 {
-    "cSpell.words": [
-        "ASPNETCORE",
-        "dotnet"
-    ]
+	"cSpell.words": [
+			"ASPNETCORE",
+			"dotnet"
+	],
+	"sqltools.connections": [
+		{
+			"mysqlOptions": {
+				"authProtocol": "default",
+				"enableSsl": "Disabled"
+			},
+			"previewLimit": 50,
+			"server": "localhost",
+			"port": 3306,
+			"driver": "MySQL",
+			"name": "Minimal-API",
+			"username": "root",
+			"database": "minimal_api",
+			"askForPassword": true
+		}
+	]
 }

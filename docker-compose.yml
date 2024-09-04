@@ -5,7 +5,9 @@ services:
     container_name: Minimal-API-DataBase
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
     restart: always
     ports:
       - 3306:3306
-
+    volumes:
+      - ./data:/var/lib/mysql

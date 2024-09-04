@@ -1,7 +1,6 @@
 {
   "recommendations": [
     "EditorConfig.EditorConfig",
-    "aaron-bond.better-comments",
     "ms-dotnettools.csdevkit",
   ]
 }
