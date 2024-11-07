@@ -5,12 +5,14 @@ using MinimalAPI.Domain.DTOs;
 using MinimalAPI.Domain.Interfaces;
 using MinimalAPI.Domain.ModelViews;
 using MinimalAPI.Domain.Services;
+using MinimalAPI.Entities;
 using MinimalAPI.Infrastructure.Db;
 
 #region Builder
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IAdminServices, AdminServices>();
+builder.Services.AddScoped<IVehicleServices, VehicleServices>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -29,18 +31,38 @@ builder.Services.AddDbContext<MyContext>(options => {
 var app = builder.Build();
 #endregion
 
-#region Admin
-app.MapGet("/", () => Results.Json(new Home()));
+#region Home
+app.MapGet("/", () => Results.Json(new Home())).WithTags("Home");
+#endregion
 
-app.MapPost("/login", ([FromBody] LoginDTO loginDTO, IAdminServices adminServices) => {
+#region Admin
+app.MapPost("/admin/login", ([FromBody] LoginDTO loginDTO, IAdminServices adminServices) => {
 	if (adminServices.Login(loginDTO) != null)
 		return Results.Ok("Login efetuado");
 	else
 		return Results.Unauthorized();
-});
+}).WithTags("Admin");
 #endregion
 
 #region Vehicles
+app.MapPost("/vehicle", ([FromBody] VehicleDTO vehicleDTO, IVehicleServices vehicleServices) => {
+	var vehicle = new Vehicles{
+		Mark = vehicleDTO.mark,
+		Name = vehicleDTO.name,
+		Year = vehicleDTO.year,
+	};
+
+	vehicleServices.Save(vehicle);
+
+	return Results.Created($"/vehicle/{vehicle.Id}", vehicle);
+}).WithTags("Vehicles");
+
+app.MapGet("/vehicles", ([FromQuery] int? page, IVehicleServices vehicleServices) => {
+	var vehicles = vehicleServices.ListAll(page);
+
+	return Results.Ok(vehicles);
+}).WithTags("Vehicles");
+
 
 #endregion
 

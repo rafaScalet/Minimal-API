@@ -15,7 +15,7 @@ public class VehicleServices(MyContext myContext) : IVehicleServices
 		_myContext.SaveChanges();
 	}
 
-	public List<Vehicles> ListAll(int page = 1, string? name = null, string? mark = null)
+	public List<Vehicles> ListAll(int? page = 1, string? name = null, string? mark = null)
 	{
 		int itemsPerPage = 10;
 
@@ -26,7 +26,9 @@ public class VehicleServices(MyContext myContext) : IVehicleServices
 			query = query.Where(v => EF.Functions.Like(v.Name.ToLower(), $"%{name.ToLower()}%"));
 		}
 
-		query = query.Skip((page - 1) * itemsPerPage).Take(itemsPerPage);
+		if (page != null) {
+			query = query.Skip(((int)page - 1) * itemsPerPage).Take(itemsPerPage);
+		}
 
 		return [.. query];
 	}
