@@ -63,10 +63,31 @@ app.MapGet("/vehicles", ([FromQuery] int? page, IVehicleServices vehicleServices
 	return Results.Ok(vehicles);
 }).WithTags("Vehicles");
 
+app.MapGet("/vehicle/{id}", ([FromRoute] int id, IVehicleServices vehicleServices) => {
+	var vehicle = vehicleServices.SearchForId(id);
+
+	if (vehicle == null) return Results.NotFound();
+
+	return Results.Ok(vehicle);
+}).WithTags("Vehicles");
+
+app.MapPut("/vehicle/{id}", ([FromRoute] int id, VehicleDTO vehicleDTO, IVehicleServices vehicleServices) => {
+	var vehicle = vehicleServices.SearchForId(id);
+
+	if (vehicle == null) return Results.NotFound();
+
+	vehicle.Name = vehicleDTO.name;
+	vehicle.Mark = vehicleDTO.mark;
+	vehicle.Year = vehicleDTO.year;
+
+	vehicleServices.Update(vehicle);
+
+	return Results.Ok(vehicle);
+});
 
 #endregion
 
-#region APP
+#region APPdocker
 app.UseSwagger();
 app.UseSwaggerUI();
 
