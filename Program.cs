@@ -83,11 +83,20 @@ app.MapPut("/vehicle/{id}", ([FromRoute] int id, VehicleDTO vehicleDTO, IVehicle
 	vehicleServices.Update(vehicle);
 
 	return Results.Ok(vehicle);
-});
+}).WithTags("Vehicles");
 
+app.MapDelete("/vehicle/{id}", ([FromRoute] int id, IVehicleServices vehicleServices) => {
+	var vehicle = vehicleServices.SearchForId(id);
+
+	if (vehicle == null) return Results.NotFound();
+
+	vehicleServices.Delete(vehicle);
+
+	return Results.NoContent();
+}).WithTags("Vehicles");
 #endregion
 
-#region APPdocker
+#region APP
 app.UseSwagger();
 app.UseSwaggerUI();
 
