@@ -13,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IAdminServices, AdminServices>();
 builder.Services.AddScoped<IVehicleServices, VehicleServices>();
+builder.Services.AddScoped<IValidationServices, ValidationServices>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -42,25 +43,31 @@ app.MapPost("/admin/login", ([FromBody] LoginDTO loginDTO, IAdminServices adminS
 	else
 		return Results.Unauthorized();
 }).WithTags("Admin");
+
+app.MapPost("/admin", ([FromBody] AdminDTO adminDTO, IValidationServices validationServices, IAdminServices adminServices) => {
+	var validationList = validationServices.Validation(adminDTO);
+
+	if (validationList.Messages.Count > 0) return Results.BadRequest(validationList);
+
+	var admin = new Admin {
+		Email = adminDTO.Email,
+		PWD = adminDTO.PWD,
+		#pragma warning disable CS8601 // Possible null reference assignment.
+		Profile = adminDTO.Profile.ToString(),
+		#pragma warning restore CS8601 // Possible null reference assignment.
+	};
+
+	adminServices.Save(admin);
+
+	return Results.Created();
+}).WithTags("Admin");
 #endregion
 
 #region Vehicles
-ValidationErrors ValidationDTO (VehicleDTO vehicleDTO) {
-	var validation = new ValidationErrors{
-		Messages = new List<string>()
-	};
+app.MapPost("/vehicle", ([FromBody] VehicleDTO vehicleDTO, IValidationServices validationServices, IVehicleServices vehicleServices) => {
+	var validationList = validationServices.Validation(vehicleDTO);
 
-	if (string.IsNullOrEmpty(vehicleDTO.name)) validation.Messages.Add("name can't be blank");
-	if (string.IsNullOrEmpty(vehicleDTO.mark)) validation.Messages.Add("mark can't be blank");
-	if (vehicleDTO.year < 1950) validation.Messages.Add("vehicle year is to old");
-
-	return validation;
-}
-
-app.MapPost("/vehicle", ([FromBody] VehicleDTO vehicleDTO, IVehicleServices vehicleServices) => {
-	var validation = ValidationDTO(vehicleDTO);
-
-	if (validation.Messages.Count > 0) return Results.BadRequest(validation);
+	if (validationList.Messages.Count > 0) return Results.BadRequest(validationList);
 
 	var vehicle = new Vehicles{
 		Mark = vehicleDTO.mark,
@@ -87,14 +94,14 @@ app.MapGet("/vehicle/{id}", ([FromRoute] int id, IVehicleServices vehicleService
 	return Results.Ok(vehicle);
 }).WithTags("Vehicles");
 
-app.MapPut("/vehicle/{id}", ([FromRoute] int id, VehicleDTO vehicleDTO, IVehicleServices vehicleServices) => {
+app.MapPut("/vehicle/{id}", ([FromRoute] int id, VehicleDTO vehicleDTO, IValidationServices validationServices, IVehicleServices vehicleServices) => {
 	var vehicle = vehicleServices.SearchForId(id);
 
 	if (vehicle == null) return Results.NotFound();
 
-	var validation = ValidationDTO(vehicleDTO);
+	var validationList = validationServices.Validation(vehicleDTO);
 
-	if (validation.Messages.Count > 0) return Results.BadRequest(validation);
+	if (validationList.Messages.Count > 0) return Results.BadRequest(validationList);
 
 	vehicle.Name = vehicleDTO.name;
 	vehicle.Mark = vehicleDTO.mark;

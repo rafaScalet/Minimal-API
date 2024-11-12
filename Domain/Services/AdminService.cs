@@ -14,8 +14,29 @@ public class AdminServices : IAdminServices
 		_myContext = myContext;
 	}
 
+	public List<Admin> List(int? page)
+	{
+		int itemsPerPage = 10;
+
+		var query = _myContext.Admin.AsQueryable();
+
+		if (page != null) {
+			query = query.Skip(((int)page - 1) * itemsPerPage).Take(itemsPerPage);
+		}
+
+		return [.. query];
+	}
+
 	public Admin? Login (LoginDTO loginDTO)
 	{
 		return _myContext.Admin.Where(admin => admin.Email == loginDTO.Email && admin.PWD == loginDTO.PWD).FirstOrDefault();
+	}
+
+	public Admin Save(Admin admin)
+	{
+		_myContext.Add(admin);
+		_myContext.SaveChanges();
+
+		return admin;
 	}
 }
