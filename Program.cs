@@ -61,6 +61,12 @@ app.MapPost("/admin", ([FromBody] AdminDTO adminDTO, IValidationServices validat
 
 	return Results.Created();
 }).WithTags("Admin");
+
+app.MapGet("/admins", ([FromQuery] int? page, IAdminServices adminServices) => {
+	var admins = adminServices.List(page);
+
+	return Results.Ok(admins);
+}).WithTags("Admin");
 #endregion
 
 #region Vehicles
